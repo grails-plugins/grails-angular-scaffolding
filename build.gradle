@@ -1,0 +1,100 @@
+buildscript {
+    repositories {
+        mavenLocal()
+        maven { url "https://repo.grails.org/grails/core" }
+    }
+    dependencies {
+        classpath "org.grails:grails-gradle-plugin:$grailsVersion"
+    }
+}
+
+plugins {
+    id 'org.asciidoctor.convert' version '1.5.3'
+}
+
+version "0.1"
+group "angular2.scaffolding"
+
+apply plugin:"eclipse"
+apply plugin:"idea"
+apply plugin:"org.grails.grails-plugin"
+apply plugin:"org.grails.grails-plugin-publish"
+
+repositories {
+    mavenLocal()
+    maven { url "https://repo.grails.org/grails/core" }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "org.grails:grails-bom:$grailsVersion"
+    }
+    applyMavenExclusions false
+}
+
+configurations {
+    documentation
+}
+
+dependencies {
+    provided 'org.springframework.boot:spring-boot-starter-logging'
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    provided "org.grails:grails-dependencies"
+    compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
+    profile "org.grails.profiles:plugin"
+    testCompile "org.grails:grails-plugin-testing"
+    documentation "org.codehaus.groovy:groovy-all:2.4.6"
+
+}
+
+bootRun {
+    jvmArgs('-Dspring.output.ansi.enabled=always')
+}
+// enable if you wish to package this plugin as a standalone application
+bootRepackage.enabled = false
+
+grailsPublish {
+    userOrg = "grails"
+    githubSlug = 'grails-plugins/grails-angular2-scaffolding'
+    license {
+        name = 'Apache-2.0'
+    }
+    title = "Angular 2 Scaffolding Plugin"
+    desc = "Provides scaffolding for Angular 2 applications"
+    developers = [jameskleeh: "James Kleeh"]
+}
+
+asciidoctor {
+    resources {
+        from('src/docs/images')
+        into "./images"
+    }
+
+    attributes 'experimental'  : 'true',
+            'compat-mode'   : 'true',
+            'toc'           : 'left',
+            'icons'         : 'font',
+            'version'       : project.version,
+            'groupId'       : project.group,
+            'artifactId'    : project.name,
+            'scaffoldingCoreVersion': scaffoldingCoreVersion,
+            'sourcedir'     : "${projectDir}/src/main/groovy"
+}
+
+task apidocs(type: Groovydoc) {
+    source project.files('src/main/groovy')
+
+    destinationDir = new File(buildDir, 'docs/api')
+    // Might need a classpath
+    docTitle = "Grails Angular Scaffolding ${version}"
+
+    classpath = configurations.documentation
+    groovyClasspath = configurations.documentation
+}
+
+task docs(type:Copy, dependsOn:[apidocs, asciidoctor])  {
+    from "$buildDir/asciidoc/html5"
+    into "$buildDir/docs"
+}
