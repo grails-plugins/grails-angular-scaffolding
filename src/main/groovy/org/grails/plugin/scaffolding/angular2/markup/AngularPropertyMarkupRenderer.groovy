@@ -3,11 +3,7 @@ package org.grails.plugin.scaffolding.angular2.markup
 import grails.util.GrailsNameUtils
 import org.grails.scaffolding.markup.PropertyMarkupRendererImpl
 import org.grails.scaffolding.model.property.DomainProperty
-import org.springframework.beans.factory.annotation.Value
 
-/**
- * Created by jameskleeh on 2/21/17.
- */
 class AngularPropertyMarkupRenderer extends PropertyMarkupRendererImpl {
 
     @Override

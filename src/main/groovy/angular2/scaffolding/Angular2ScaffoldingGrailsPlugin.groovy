@@ -1,6 +1,6 @@
 package angular2.scaffolding
 
-import grails.plugins.*
+import grails.plugins.Plugin
 import org.grails.scaffolding.ScaffoldingBeanConfiguration
 
 class Angular2ScaffoldingGrailsPlugin extends Plugin {

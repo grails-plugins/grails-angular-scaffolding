@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Params} from "@angular/router";
-import {${className}} from "./${propertyName}";
+import {${className}} from './${propertyName}';
 import {${className}Service} from "./${propertyName}.service";
 
 @Component({

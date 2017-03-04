@@ -1,6 +1,6 @@
 import {Component, OnInit} from '@angular/core';
-import {${className}Service} from "./${propertyName}.service";
-import {${className}} from "./${propertyName}";
+import {${className}Service} from './${propertyName}.service';
+import {${className}} from './${propertyName}';
 
 @Component({
   selector: '${propertyName}-list',

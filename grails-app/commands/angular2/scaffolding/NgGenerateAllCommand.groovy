@@ -1,7 +1,7 @@
 package angular2.scaffolding
 
 import grails.codegen.model.Model
-import grails.dev.commands.*
+import grails.dev.commands.GrailsApplicationCommand
 import grails.web.mapping.UrlMappings
 import grails.web.mapping.exceptions.UrlMappingException
 import org.grails.datastore.mapping.model.MappingContext
@@ -12,6 +12,7 @@ import org.grails.plugin.scaffolding.angular2.template.AngularModuleEditor
 import org.grails.scaffolding.markup.DomainMarkupRenderer
 import org.grails.scaffolding.model.DomainModelService
 import org.grails.scaffolding.model.property.DomainProperty
+import org.grails.scaffolding.registry.input.BooleanInputRenderer
 import org.grails.scaffolding.registry.input.CurrencyInputRenderer
 import org.grails.scaffolding.registry.input.FileInputRenderer
 import org.grails.scaffolding.registry.input.TimeZoneInputRenderer
@@ -58,12 +59,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         Model module = model(domainClass.javaClass)
 
-
         String formTemplate = domainMarkupRenderer.renderInput(domainClass)
         String showTemplate = domainMarkupRenderer.renderOutput(domainClass)
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
-
-
 
         if (!domainClass) {
             System.err.println("Error | The domain class you entered: \"${domainClassName}\" could not be found")
