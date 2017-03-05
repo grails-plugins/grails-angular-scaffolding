@@ -14,7 +14,6 @@ export class ${className}ShowComponent implements OnInit {
   constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service) {}
 
   ngOnInit() {
-    ${initializingStatements.join('\n    ')}
     this.route.params.subscribe((params: Params) => {
       this.${propertyName}Service.get(+params['id']).subscribe((${propertyName}: ${className}) => {
         this.${propertyName} = ${propertyName};

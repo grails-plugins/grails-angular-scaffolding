@@ -13,7 +13,7 @@ plugins {
 }
 
 version "0.1"
-group "angular2.scaffolding"
+group "org.grails.plugins"
 
 apply plugin:"eclipse"
 apply plugin:"idea"
@@ -46,7 +46,6 @@ dependencies {
     profile "org.grails.profiles:plugin"
     testCompile "org.grails:grails-plugin-testing"
     documentation "org.codehaus.groovy:groovy-all:2.4.6"
-
 }
 
 bootRun {
@@ -88,7 +87,7 @@ task apidocs(type: Groovydoc) {
 
     destinationDir = new File(buildDir, 'docs/api')
     // Might need a classpath
-    docTitle = "Grails Angular Scaffolding ${version}"
+    docTitle = "Grails Angular 2 Scaffolding ${version}"
 
     classpath = configurations.documentation
     groovyClasspath = configurations.documentation
