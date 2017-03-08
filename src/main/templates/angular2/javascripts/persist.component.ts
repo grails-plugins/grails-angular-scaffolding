@@ -1,7 +1,9 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Params} from "@angular/router";
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import {${className}} from './${propertyName}';
-import {${className}Service} from "./${propertyName}.service";
+import {${className}Service} from './${propertyName}.service';
+import {Response} from "@angular/http";
+
 
 @Component({
   selector: '${propertyName}-persist',
@@ -10,14 +12,17 @@ import {${className}Service} from "./${propertyName}.service";
 export class ${className}PersistComponent implements OnInit {
 
   ${propertyName} = new ${className}();
+  create = true;
+  errors: any[];
 
-  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service) {}
+  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service, private router: Router) {}
 
   ngOnInit() {
     ${initializingStatements.join('\n    ')}
     this.route.params.subscribe((params: Params) => {
       if (params.hasOwnProperty('id')) {
         this.${propertyName}Service.get(+params['id']).subscribe((${propertyName}: ${className}) => {
+          this.create = false;
           this.${propertyName} = ${propertyName};
         });
       }
@@ -25,10 +30,15 @@ export class ${className}PersistComponent implements OnInit {
   }
 
   save() {
-    this.${propertyName}Service.save(this.${propertyName}).subscribe(() => {
-      alert('Save successful');
-    }, () => {
-      alert('Save NOT successful');
+    this.${propertyName}Service.save(this.${propertyName}).subscribe((${propertyName}: ${className}) => {
+      this.router.navigate(['/${propertyName}', 'show', ${propertyName}.id]);
+    }, (res: Response) => {
+      const json = res.json();
+      if (json.hasOwnProperty('message')) {
+        this.errors = [json];
+      } else {
+        this.errors = json._embedded.errors;
+      }
     });
   }
 }

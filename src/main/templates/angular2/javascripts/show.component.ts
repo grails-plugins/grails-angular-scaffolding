@@ -1,5 +1,5 @@
 import {Component, OnInit} from '@angular/core';
-import {ActivatedRoute, Params} from '@angular/router';
+import {ActivatedRoute, Params, Router} from '@angular/router';
 import {${className}} from './${propertyName}';
 import {${className}Service} from './${propertyName}.service';
 
@@ -11,7 +11,7 @@ export class ${className}ShowComponent implements OnInit {
 
   ${propertyName} = new ${className}();
 
-  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service) {}
+  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service, private router: Router) {}
 
   ngOnInit() {
     this.route.params.subscribe((params: Params) => {
@@ -19,6 +19,18 @@ export class ${className}ShowComponent implements OnInit {
         this.${propertyName} = ${propertyName};
       });
     });
+  }
+
+  destroy() {
+    if (confirm("Are you sure?")) {
+      this.${propertyName}Service.destroy(this.${propertyName}).subscribe((success: boolean) => {
+        if (success) {
+          this.router.navigate(['/${propertyName}','list']);
+        } else {
+          alert("Error occurred during delete");
+        }
+      });
+    }
   }
 
 }

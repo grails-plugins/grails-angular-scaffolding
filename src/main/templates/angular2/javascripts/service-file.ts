@@ -2,7 +2,9 @@ import {Injectable} from "@angular/core";
 import {Http, Response, RequestOptions, RequestMethod, Request, Headers} from "@angular/http";
 import {Observable} from "rxjs/Observable";
 import {${className}} from "./${propertyName}";
-import {Subject} from "rxjs";
+import {Subject} from "rxjs/Subject";
+
+import 'rxjs/add/operator/catch';
 
 @Injectable()
 export class ${className}Service {
@@ -37,7 +39,7 @@ export class ${className}Service {
 
     for (let property in ${propertyName}) {
       if (${propertyName}.hasOwnProperty(property)) {
-        formData.append(property, ${propertyName}[property])
+        formData.append(property, ${propertyName}[property]);
       }
     }
 
@@ -56,5 +58,11 @@ export class ${className}Service {
 
     return this.http.request(new Request(requestOptions))
       .map((r: Response) => new ${className}(r.json()));
+  }
+
+  destroy(${propertyName}: ${className}): Observable<boolean> {
+    return this.http.delete(this.baseUrl + '${uri}/' + ${propertyName}.id).map((res: Response) => res.ok).catch(() => {
+      return Observable.of(false);
+    });
   }
 }

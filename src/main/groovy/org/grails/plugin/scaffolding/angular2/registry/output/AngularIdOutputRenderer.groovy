@@ -16,7 +16,7 @@ class AngularIdOutputRenderer extends AngularDomainOutputRenderer {
     Closure renderListOutput(DomainProperty property) {
         final String propertyPath = buildPropertyPath(property)
         return { ->
-            a("{{${propertyPath}}}", ["[routerLink]": "['${getPropertyName(property)}','show',${propertyPath}]"])
+            a("{{${propertyPath}}}", ["[routerLink]": "['/${getPropertyName(property)}','show',${propertyPath}]"])
         }
     }
 

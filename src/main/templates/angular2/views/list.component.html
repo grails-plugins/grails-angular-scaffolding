@@ -1,0 +1,10 @@
+<div class="nav" role="navigation">
+    <ul>
+        <li><a [routerLink]="['/index']" class="home">Home</a></li>
+        <li><a [routerLink]="['/${propertyName}','create']" class="create">New ${className}</a></li>
+    </ul>
+</div>
+<div id="list-${propertyName}" class="content scaffold-list" role="main">
+    <h1>${className} List</h1>
+    ${template}
+</div>

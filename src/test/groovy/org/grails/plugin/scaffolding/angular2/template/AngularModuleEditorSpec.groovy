@@ -6,7 +6,7 @@ import spock.lang.Shared
 import spock.lang.Specification
 import spock.lang.Subject
 
-@Subject(AngularModuleEditor)
+@Subject(AngularModuleEditorImpl)
 class AngularModuleEditorSpec extends Specification {
 
     @Shared
@@ -16,7 +16,7 @@ class AngularModuleEditorSpec extends Specification {
     Model model = new ModelBuilder.ModelImpl("com.foo.Bar")
 
     @Shared
-    AngularModuleEditor editor
+    AngularModuleEditorImpl editor
 
     @Shared
     String lineEnding = System.getProperty('line.separator')
@@ -26,7 +26,7 @@ class AngularModuleEditorSpec extends Specification {
 
     void setup() {
         file = File.createTempFile("angularModule", "js")
-        editor = new AngularModuleEditor()
+        editor = new AngularModuleEditorImpl()
     }
 
     void cleanup() {
@@ -48,6 +48,31 @@ class AngularModuleEditorSpec extends Specification {
         file.text == """
             @NgModule({
                 imports: [
+    BarModule
+]
+            })
+        """
+        success
+    }
+
+    void "test addModuleImport will append to an existing list"() {
+        given:
+        file.write("""
+            @NgModule({
+                imports: [
+                    Foo
+                ]
+            })
+        """)
+
+        when:
+        boolean success = editor.addModuleImport(file, model)
+
+        then:
+        file.text == """
+            @NgModule({
+                imports: [
+    Foo,
     BarModule
 ]
             })
@@ -181,7 +206,9 @@ imports: [
         given:
         file.write("""
             @NgModule({
-                imports: [BarModule]
+                imports: [
+                    BarModule
+                ]
             })
         """)
 
@@ -191,7 +218,9 @@ imports: [
         then:
         file.text == """
             @NgModule({
-                imports: [BarModule]
+                imports: [
+                    BarModule
+                ]
             })
         """
         success

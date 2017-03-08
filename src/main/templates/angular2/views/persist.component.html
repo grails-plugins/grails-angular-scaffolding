@@ -1,0 +1,21 @@
+<div class="nav" role="navigation">
+    <ul>
+        <li><a [routerLink]="['/index']" class="home">Home</a></li>
+        <li><a [routerLink]="['/${propertyName}','list']" class="list">${className} List</a></li>
+    </ul>
+</div>
+<div id="persist-${propertyName}" class="content scaffold-edit" role="main">
+    <h1>{{create ? "Create" : "Edit"}} ${className}</h1>
+    <ul class="errors" role="alert" *ngIf="errors">
+        <li *ngFor="let error of errors">{{error.message}}</li>
+    </ul>
+
+    <form name="save{className}" (ngSubmit)="save()">
+        <fieldset class="form">
+            ${template}
+        </fieldset>
+        <fieldset class="buttons">
+            <input type="submit" class="save" [value]="create ? 'Save' : 'Update'" />
+        </fieldset>
+    </form>
+</div>

@@ -1,6 +1,10 @@
-package angular2.scaffolding
+package org.grails.plugin.scaffolding.angular2
 
 import grails.plugins.Plugin
+import org.grails.plugin.scaffolding.angular2.markup.AngularContextMarkupRenderer
+import org.grails.plugin.scaffolding.angular2.markup.AngularPropertyMarkupRenderer
+import org.grails.plugin.scaffolding.angular2.registry.AngularDomainRendererRegisterer
+import org.grails.plugin.scaffolding.angular2.template.AngularModuleEditorImpl
 import org.grails.scaffolding.ScaffoldingBeanConfiguration
 
 class Angular2ScaffoldingGrailsPlugin extends Plugin {
@@ -25,5 +29,12 @@ This plugin provides the ability to generate an AngularJS CRUD interface based o
     Closure doWithSpring() {{ ->
         scaffoldingCoreConfig(ScaffoldingBeanConfiguration)
 
+        propertyMarkupRenderer(AngularPropertyMarkupRenderer)
+
+        contextMarkupRenderer(AngularContextMarkupRenderer)
+
+        angularModuleEditor(AngularModuleEditorImpl)
+
+        angularDomainRendererRegisterer(AngularDomainRendererRegisterer)
     }}
 }
