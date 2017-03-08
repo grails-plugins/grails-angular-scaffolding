@@ -41,7 +41,7 @@ dependencies {
     compileOnly "org.springframework.boot:spring-boot-starter-actuator"
     compileOnly "org.springframework.boot:spring-boot-autoconfigure"
     compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
-    compileOnly "org.grails:grails-dependencies"
+    compile "org.grails:grails-dependencies"
     console "org.grails:grails-console"
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
