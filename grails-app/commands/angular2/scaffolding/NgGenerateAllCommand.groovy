@@ -63,6 +63,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         String showTemplate = domainMarkupRenderer.renderOutput(domainClass)
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
 
+        Map htmlTemplates = [persist: formTemplate, list: listTemplate, show: showTemplate]
+
         if (!domainClass) {
             System.err.println("Error | The domain class you entered: \"${domainClassName}\" could not be found")
             return
@@ -86,6 +88,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         List<DomainProperty> associatedProperties = []
         Boolean hasFileProperty = false
         List<String> initializingStatements = []
+        List<String> domainProperties = []
         domainModelService.getInputProperties(domainClass).each { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
             if (prop instanceof Association) {
@@ -101,7 +104,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                     initializingStatements.add("this.${module.propertyName}.${property.name} = false;")
                 }
             }
-
+            domainProperties.add(property.name)
         }
 
 
@@ -112,7 +115,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         render template: template("angular2/javascripts/domain.ts"),
                 destination: file("${baseDir}/${module.propertyName}/${module.propertyName}.ts"),
-                model: module,
+                model: module.asMap() << [domainProperties: domainProperties],
                 overwrite: overwrite
 
         render template: template("angular2/javascripts/module.ts"),
@@ -133,8 +136,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             render template: template("angular2/views/${it}.component.html"),
                     destination: file("${baseDir}/${module.propertyName}/${module.propertyName}-${it}.component.html"),
-                    model: module,
+                    model: module.asMap() << [template: htmlTemplates.get(it)],
                     overwrite: overwrite
+
         }
 
         File appModule = new File(baseDir, bootstrapModule)
@@ -153,6 +157,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         associatedProperties.each {
 
         }
+
+        true
 
     }
 

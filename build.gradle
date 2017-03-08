@@ -12,7 +12,7 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.3'
 }
 
-version "0.1"
+version "1.0.0.BUILD-SNAPSHOT"
 group "org.grails.plugins"
 
 apply plugin:"eclipse"
@@ -37,11 +37,12 @@ configurations {
 }
 
 dependencies {
-    provided 'org.springframework.boot:spring-boot-starter-logging'
-    provided "org.springframework.boot:spring-boot-starter-actuator"
-    provided "org.springframework.boot:spring-boot-autoconfigure"
-    provided "org.springframework.boot:spring-boot-starter-tomcat"
-    provided "org.grails:grails-dependencies"
+    compileOnly 'org.springframework.boot:spring-boot-starter-logging'
+    compileOnly "org.springframework.boot:spring-boot-starter-actuator"
+    compileOnly "org.springframework.boot:spring-boot-autoconfigure"
+    compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
+    compileOnly "org.grails:grails-dependencies"
+    console "org.grails:grails-console"
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
     testCompile "org.grails:grails-plugin-testing"
