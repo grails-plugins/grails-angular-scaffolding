@@ -1,0 +1,7 @@
+angular2.scaffolding
+org.grails.plugin.scaffolding.angular2
+org.grails.plugin.scaffolding.angular2.markup
+org.grails.plugin.scaffolding.angular2.registry
+org.grails.plugin.scaffolding.angular2.registry.input
+org.grails.plugin.scaffolding.angular2.registry.output
+org.grails.plugin.scaffolding.angular2.template
