@@ -37,11 +37,11 @@ configurations {
 }
 
 dependencies {
-    compileOnly 'org.springframework.boot:spring-boot-starter-logging'
-    compileOnly "org.springframework.boot:spring-boot-starter-actuator"
-    compileOnly "org.springframework.boot:spring-boot-autoconfigure"
-    compileOnly "org.springframework.boot:spring-boot-starter-tomcat"
-    compile "org.grails:grails-dependencies"
+    provided 'org.springframework.boot:spring-boot-starter-logging'
+    provided "org.springframework.boot:spring-boot-starter-actuator"
+    provided "org.springframework.boot:spring-boot-autoconfigure"
+    provided "org.springframework.boot:spring-boot-starter-tomcat"
+    provided "org.grails:grails-dependencies"
     console "org.grails:grails-console"
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
