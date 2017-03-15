@@ -3,7 +3,7 @@ import {ActivatedRoute, Params, Router} from '@angular/router';
 import {${className}} from './${propertyName}';
 import {${className}Service} from './${propertyName}.service';
 import {Response} from "@angular/http";
-
+<%= componentImports.join('\n') %>
 
 @Component({
   selector: '${propertyName}-persist',
@@ -14,8 +14,9 @@ export class ${className}PersistComponent implements OnInit {
   ${propertyName} = new ${className}();
   create = true;
   errors: any[];
+  <%= componentProperties.join('\n  ') %>
 
-  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service, private router: Router) {}
+  constructor(private route: ActivatedRoute, private ${propertyName}Service: ${className}Service, private router: Router<%= constructorArguments ? ', ' + constructorArguments.join(', ') : '' %>) {}
 
   ngOnInit() {
     ${initializingStatements.join('\n    ')}
@@ -27,6 +28,10 @@ export class ${className}PersistComponent implements OnInit {
         });
       }
     });
+  }
+
+  identifier(index: number, item: any) {
+    return item.id;
   }
 
   save() {

@@ -1,7 +1,7 @@
 export class ${className} {
   id: number;
 
-  <%= domainProperties.collect { "${it}: any;" }.join('\n  ') %>
+  <%= domainProperties.collect { k,v -> "${k}: ${v};" }.join('\n  ') %>
 
   constructor (object?: any) {
     for (var prop in object) {

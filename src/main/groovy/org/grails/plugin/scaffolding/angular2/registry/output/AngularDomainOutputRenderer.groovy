@@ -7,18 +7,7 @@ import org.grails.scaffolding.registry.DomainOutputRenderer
 /**
  * Created by Jim on 5/25/2016.
  */
-abstract class AngularDomainOutputRenderer implements DomainOutputRenderer {
-
-    protected String buildPropertyPath(DomainProperty property) {
-        StringBuilder sb = new StringBuilder()
-        sb.append(getPropertyName(property)).append('.')
-        sb.append(property.pathFromRoot)
-        sb.toString()
-    }
-
-    protected String getPropertyName(DomainProperty property) {
-        GrailsNameUtils.getPropertyName(property.rootBeanType)
-    }
+abstract class AngularDomainOutputRenderer implements DomainOutputRenderer, PropertyHelper {
 
     @Override
     Closure renderListOutput(DomainProperty property) {
@@ -27,10 +16,6 @@ abstract class AngularDomainOutputRenderer implements DomainOutputRenderer {
 
     @Override
     Closure renderOutput(DomainProperty property) {
-        StringBuilder sb = new StringBuilder()
-        sb.append(GrailsNameUtils.getPropertyName(property.rootBeanType)).append('.')
-        sb.append(property.pathFromRoot)
-        sb.toString()
         renderOutput(getPropertyName(property), buildPropertyPath(property))
     }
 

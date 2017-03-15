@@ -2,12 +2,14 @@ package angular2.scaffolding
 
 import grails.codegen.model.Model
 import grails.dev.commands.GrailsApplicationCommand
+import grails.util.GrailsNameUtils
 import grails.web.mapping.UrlMappings
 import grails.web.mapping.exceptions.UrlMappingException
 import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.ToMany
 import org.grails.plugin.scaffolding.angular2.template.AngularModuleEditor
 import org.grails.scaffolding.markup.DomainMarkupRenderer
 import org.grails.scaffolding.model.DomainModelService
@@ -70,16 +72,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             return
         }
 
-        String uri
-        try {
-            uri = grailsUrlMappingsHolder
-                    .getReverseMapping(module.propertyName, "index", null, null, "GET", Collections.emptyMap())
-                    .createRelativeURL(module.propertyName, "index", [:], 'UTF8')
-                    .replaceFirst('/', '')
-                    .replace('/index', '')
-        } catch (UrlMappingException e) {
-            uri = module.propertyName
-        }
+        String uri = getUri(module)
 
         FileInputRenderer fileInputRenderer = new FileInputRenderer()
         CurrencyInputRenderer currencyInputRenderer = new CurrencyInputRenderer()
@@ -88,11 +81,28 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         List<DomainProperty> associatedProperties = []
         Boolean hasFileProperty = false
         List<String> initializingStatements = []
-        List<String> domainProperties = []
+        List<String> constructorArguments = []
+        List<String> componentProperties = []
+        List<String> componentImports = []
+        Map<String, String> domainProperties = [:]
+
         domainModelService.getInputProperties(domainClass).each { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
+            domainProperties.put(property.name, 'any')
             if (prop instanceof Association) {
                 associatedProperties.add(property)
+                String type = property.associatedType.simpleName
+                String name = GrailsNameUtils.getPropertyName(type)
+
+                constructorArguments.add("private ${name}Service: ${type}Service")
+                initializingStatements.add("this.${name}Service.list().subscribe((${name}List: ${type}[]) => { this.${name}List = ${name}List; });")
+                componentProperties.add("${name}List: ${type}[];")
+                componentImports.add("import { ${type}Service } from '../${name}/${name}.service';")
+                componentImports.add("import { ${type} } from '../${name}/${name}';")
+
+                if (prop instanceof ToMany) {
+                    domainProperties.put(property.name, 'any[]')
+                }
             } else {
                 if (fileInputRenderer.supports(property)) {
                     hasFileProperty = true
@@ -102,9 +112,16 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                     initializingStatements.add("this.${module.propertyName}.${property.name} = '${timeZoneInputRenderer.getOptionKey(timeZoneInputRenderer.getDefaultOption())}';")
                 } else if (booleanInputRenderer.supports(property)) {
                     initializingStatements.add("this.${module.propertyName}.${property.name} = false;")
+                    domainProperties.put(property.name, 'boolean')
+                } else {
+                    if (property.type == String) {
+                        domainProperties.put(property.name, 'string')
+                    } else if (Number.isAssignableFrom(property.type)) {
+                        domainProperties.put(property.name, 'number')
+                    }
                 }
             }
-            domainProperties.add(property.name)
+
         }
 
 
@@ -118,8 +135,9 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 model: module.asMap() << [domainProperties: domainProperties],
                 overwrite: overwrite
 
+        File moduleFile = file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts")
         render template: template("angular2/javascripts/module.ts"),
-                destination: file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts"),
+                destination: moduleFile,
                 model: module,
                 overwrite: overwrite
 
@@ -131,7 +149,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         ['persist', 'list', 'show'].each {
             render template: template("angular2/javascripts/${it}.component.ts"),
                     destination: file("${baseDir}/${module.propertyName}/${module.propertyName}-${it}.component.ts"),
-                    model: module.asMap() << [initializingStatements: initializingStatements],
+                    model: module.asMap() << [initializingStatements: initializingStatements, constructorArguments: constructorArguments, componentProperties: componentProperties, componentImports: componentImports],
                     overwrite: overwrite
 
             render template: template("angular2/views/${it}.component.html"),
@@ -156,10 +174,46 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         associatedProperties.each {
 
+            Model associatedModel = model(it.associatedType)
+
+            uri = getUri(associatedModel)
+
+            render template: template("angular2/javascripts/service.ts"),
+                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.service.ts"),
+                    model: associatedModel.asMap() << [uri: uri],
+                    overwrite: overwrite
+
+            render template: template("angular2/javascripts/domain.ts"),
+                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.ts"),
+                    model: associatedModel.asMap() << [domainProperties: [:]],
+                    overwrite: overwrite
+
+            render template: template("angular2/javascripts/module.ts"),
+                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.module.ts"),
+                    model: associatedModel.asMap() << [associatedModule: true],
+                    overwrite: overwrite
+
+            if (angularModuleEditor.addDependency(moduleFile, associatedModel, '..')) {
+                println("Added ${associatedModel.className} as a dependency to your ${module.propertyName} module")
+            } else {
+                println("Warning | An error occurred importing the ${associatedModel.className} module into your ${module.propertyName} module")
+            }
         }
 
         true
 
+    }
+
+    void getUri(Model model) {
+        try {
+            grailsUrlMappingsHolder
+                    .getReverseMapping(model.propertyName, "index", null, null, "GET", Collections.emptyMap())
+                    .createRelativeURL(model.propertyName, "index", [:], 'UTF8')
+                    .replaceFirst('/', '')
+                    .replace('/index', '')
+        } catch (UrlMappingException e) {
+            model.propertyName
+        }
     }
 
 

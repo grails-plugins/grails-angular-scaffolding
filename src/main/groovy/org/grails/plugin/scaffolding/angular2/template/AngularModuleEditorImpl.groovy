@@ -93,8 +93,8 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
     }
 
     @Override
-    boolean addImport(File module, Model model) {
-        String importStatement = "import { ${getModuleName(model)} } from './${model.propertyName}/${model.propertyName}.module';"
+    boolean addImport(File module, Model model, String relativeDir = '.') {
+        String importStatement = "import { ${getModuleName(model)} } from '${relativeDir}/${model.propertyName}/${model.propertyName}.module';"
         try {
             String moduleText = module.text
             Matcher group = (moduleText =~ /import .*(?:\r\n|\n|\r)?/)
@@ -126,9 +126,9 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
     }
 
     @Override
-    boolean addDependency(File module, Model model) {
+    boolean addDependency(File module, Model model, String relativeDir = '.') {
         String originalText = module.text
-        if (addModuleImport(module, model) && addImport(module, model)) {
+        if (addModuleImport(module, model) && addImport(module, model, relativeDir)) {
             true
         } else {
             module.write(originalText)

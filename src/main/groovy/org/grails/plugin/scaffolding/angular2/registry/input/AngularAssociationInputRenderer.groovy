@@ -26,7 +26,7 @@ class AngularAssociationInputRenderer implements DomainInputRenderer {
 
         return { ->
             select('', defaultAttributes) {
-                option("{{$name}}", ["*ngFor": "let $name of ${name}List", "[value]": name])
+                option("{{${name}.toString()}}", ["*ngFor": "let $name of ${name}List;trackBy:identifier", "[value]": "${name}.id"])
             }
         }
     }

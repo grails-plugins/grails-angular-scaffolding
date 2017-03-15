@@ -6,7 +6,7 @@ interface AngularModuleEditor {
 
     boolean addModuleImport(File module, Model model)
 
-    boolean addImport(File module, Model model)
+    boolean addImport(File module, Model model, String relativeDir)
 
-    boolean addDependency(File module, Model model)
+    boolean addDependency(File module, Model model, String relativeDir)
 }

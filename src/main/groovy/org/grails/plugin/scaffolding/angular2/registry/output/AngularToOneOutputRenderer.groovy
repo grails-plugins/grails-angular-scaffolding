@@ -15,14 +15,9 @@ class AngularToOneOutputRenderer extends AngularDomainOutputRenderer {
     }
 
     @Override
-    protected String getPropertyName(DomainProperty property) {
-        GrailsNameUtils.getPropertyName(property.associatedType)
-    }
-
-    @Override
     protected Closure renderOutput(String propertyName, String propertyPath) {
         return { ->
-            a("{{${propertyPath}.toString()}}", ["[routerLink]": "['${propertyName}','show', '${propertyPath}.id']"])
+            a("{{${propertyPath}.toString()}}", ["[routerLink]": "['/${propertyName}','show', ${propertyPath}.id]"])
         }
     }
 }
