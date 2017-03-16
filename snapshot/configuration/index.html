@@ -425,7 +425,6 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <ul class="sectlevel1">
 <li><a href="#_configuration">Configuration</a>
 <ul class="sectlevel2">
-<li><a href="#_controller_name">Controller Name</a></li>
 <li><a href="#_asset_paths">Asset Paths</a></li>
 </ul>
 </li>
@@ -437,16 +436,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 <h2 id="_configuration">Configuration</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This plugin exposes a few configuration options to control how assets are rendered:</p>
-</div>
-<div class="sect2">
-<h3 id="_controller_name">Controller Name</h3>
-<div class="paragraph">
-<p>JavaScript templates and controllers are designed to use the "controllerAs" syntax. You can control what name is used:</p>
-</div>
-<div class="paragraph">
-<p><code>grails.codegen.angular.controllerName</code>. The default value is <code>vm</code>.</p>
-</div>
+<p>This plugin exposes configuration options to control how assets are rendered:</p>
 </div>
 <div class="sect2">
 <h3 id="_asset_paths">Asset Paths</h3>
@@ -465,29 +455,14 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </thead>
 <tbody>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.angularPath</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Angular source require path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/angular/angular</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.uiRouterPath</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">UI Router source require path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/angular/angular-ui-router</code></p></td>
-</tr>
-<tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.ngResourcePath</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">Angular ngResource source require path</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>/angular/angular-resource</code></p></td>
-</tr>
-<tr>
 <td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.baseDir</code></p></td>
 <td class="tableblock halign-left valign-top"><p class="tableblock">The base directory where assets should be stored</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails-app/assets</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>../client/src/app</code></p></td>
 </tr>
 <tr>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.assetDir</code></p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock">The sub directory where assets should be stored</p></td>
-<td class="tableblock halign-left valign-top"><p class="tableblock"><code>javascripts</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>grails.codegen.angular.bootstrapModule</code></p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock">The path to the bootstrap module relative to the base directory</p></td>
+<td class="tableblock halign-left valign-top"><p class="tableblock"><code>app.module.ts</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -497,7 +472,7 @@ body.book #toc,body.book #preamble,body.book h1.sect0,body.book .sect1>h2{page-b
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-03-15 06:23:19 UTC
+Last updated 2017-03-16 13:42:42 UTC
 </div>
 </div>
 </body>
