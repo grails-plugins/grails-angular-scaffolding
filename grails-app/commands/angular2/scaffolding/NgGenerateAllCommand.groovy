@@ -138,7 +138,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         File moduleFile = file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts")
         render template: template("angular2/javascripts/module.ts"),
                 destination: moduleFile,
-                model: module,
+                model: module.asMap() << [associatedModule: false],
                 overwrite: overwrite
 
         render template: template("angular2/javascripts/routing.module.ts"),
