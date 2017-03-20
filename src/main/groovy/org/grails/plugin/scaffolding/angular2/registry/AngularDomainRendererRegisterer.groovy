@@ -2,6 +2,7 @@ package org.grails.plugin.scaffolding.angular2.registry
 
 import org.grails.plugin.scaffolding.angular2.registry.input.AngularAssociationInputRenderer
 import org.grails.plugin.scaffolding.angular2.registry.input.AngularBidirectionalToManyInputRenderer
+import org.grails.plugin.scaffolding.angular2.registry.input.AngularDateInputRenderer
 import org.grails.plugin.scaffolding.angular2.registry.input.AngularFileInputRenderer
 import org.grails.plugin.scaffolding.angular2.registry.output.*
 import org.grails.scaffolding.registry.DomainInputRendererRegistry
@@ -23,6 +24,7 @@ class AngularDomainRendererRegisterer {
         domainInputRendererRegistry.registerDomainRenderer(new AngularAssociationInputRenderer(), 0)
         domainInputRendererRegistry.registerDomainRenderer(new AngularFileInputRenderer(), 0)
         domainInputRendererRegistry.registerDomainRenderer(new AngularBidirectionalToManyInputRenderer(), 0)
+        domainInputRendererRegistry.registerDomainRenderer(new AngularDateInputRenderer(), 0)
 
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDefaultOutputRenderer(), 0)
         domainOutputRendererRegistry.registerDomainRenderer(new AngularDateOutputRenderer(), 0)

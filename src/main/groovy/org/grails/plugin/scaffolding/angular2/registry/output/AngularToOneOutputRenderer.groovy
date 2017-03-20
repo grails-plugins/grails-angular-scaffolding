@@ -17,7 +17,7 @@ class AngularToOneOutputRenderer extends AngularDomainOutputRenderer {
     @Override
     protected Closure renderOutput(String propertyName, String propertyPath) {
         return { ->
-            a("{{${propertyPath}.toString()}}", ["[routerLink]": "['/${propertyName}','show', ${propertyPath}.id]"])
+            a("{{${propertyPath}.toString()}}", ["*ngIf": propertyPath, "[routerLink]": "['/${propertyName}','show', ${propertyPath}.id]"])
         }
     }
 }

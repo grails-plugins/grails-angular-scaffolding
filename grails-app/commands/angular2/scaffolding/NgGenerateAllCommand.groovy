@@ -85,6 +85,8 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         List<String> componentProperties = []
         List<String> componentImports = []
         Map<String, String> domainProperties = [:]
+        List<String> domainConstructorInitializingStatements = []
+        List<String> domainImports = []
 
         domainModelService.getInputProperties(domainClass).each { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
@@ -99,10 +101,15 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 componentProperties.add("${name}List: ${type}[];")
                 componentImports.add("import { ${type}Service } from '../${name}/${name}.service';")
                 componentImports.add("import { ${type} } from '../${name}/${name}';")
-
+                domainImports.add("import { ${type} } from '../${name}/${name}';")
                 if (prop instanceof ToMany) {
-                    domainProperties.put(property.name, 'any[]')
+                    domainProperties.put(property.name, "$type[]")
+                    domainConstructorInitializingStatements.add("this.${property.name} = object['${property.name}'].map((obj: any) => { return new ${type}(obj); });")
+                } else {
+                    domainProperties.put(property.name, type)
+                    domainConstructorInitializingStatements.add("this.${property.name} = new ${type}(object['${property.name}']);")
                 }
+                domainConstructorInitializingStatements.add("delete object['${property.name}'];")
             } else {
                 if (fileInputRenderer.supports(property)) {
                     hasFileProperty = true
@@ -132,7 +139,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
         render template: template("angular2/javascripts/domain.ts"),
                 destination: file("${baseDir}/${module.propertyName}/${module.propertyName}.ts"),
-                model: module.asMap() << [domainProperties: domainProperties],
+                model: module.asMap() << [domainProperties: domainProperties, domainConstructorInitializingStatements: domainConstructorInitializingStatements, domainImports: domainImports],
                 overwrite: overwrite
 
         File moduleFile = file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts")
@@ -185,7 +192,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
             render template: template("angular2/javascripts/domain.ts"),
                     destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.ts"),
-                    model: associatedModel.asMap() << [domainProperties: [:]],
+                    model: associatedModel.asMap() << [domainProperties: [:], domainConstructorInitializingStatements: [], domainImports: []],
                     overwrite: overwrite
 
             render template: template("angular2/javascripts/module.ts"),

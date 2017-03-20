@@ -30,10 +30,6 @@ export class ${className}PersistComponent implements OnInit {
     });
   }
 
-  identifier(index: number, item: any) {
-    return item.id;
-  }
-
   save() {
     this.${propertyName}Service.save(this.${propertyName}).subscribe((${propertyName}: ${className}) => {
       this.router.navigate(['/${propertyName}', 'show', ${propertyName}.id]);
