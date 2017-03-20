@@ -59,6 +59,11 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             domainClass = grailsDomainClassMappingContext.getPersistentEntities().find { it.javaClass.simpleName == domainClassName }
         }
 
+        if (!domainClass) {
+            System.err.println("Error | The domain class you entered: \"${domainClassName}\" could not be found")
+            return false
+        }
+
         Model module = model(domainClass.javaClass)
 
         String formTemplate = domainMarkupRenderer.renderInput(domainClass)
@@ -66,11 +71,6 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         String listTemplate = domainMarkupRenderer.renderListOutput(domainClass)
 
         Map htmlTemplates = [persist: formTemplate, list: listTemplate, show: showTemplate]
-
-        if (!domainClass) {
-            System.err.println("Error | The domain class you entered: \"${domainClassName}\" could not be found")
-            return
-        }
 
         String uri = getUri(module)
 
@@ -204,7 +204,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
 
     }
 
-    void getUri(Model model) {
+    String getUri(Model model) {
         try {
             grailsUrlMappingsHolder
                     .getReverseMapping(model.propertyName, "index", null, null, "GET", Collections.emptyMap())
