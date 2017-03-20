@@ -21,9 +21,6 @@ import {${className}PersistComponent} from './${propertyName}-persist.component'
   ],
   providers: [
     ${className}Service
-  ],
-  exports: [
-    ${className}Service
   ]
 })
 export class ${className}Module {}
