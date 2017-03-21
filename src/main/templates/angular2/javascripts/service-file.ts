@@ -5,6 +5,7 @@ import {${className}} from "./${propertyName}";
 import {Subject} from "rxjs/Subject";
 
 import 'rxjs/add/operator/catch';
+import 'rxjs/add/observable/of';
 
 @Injectable()
 export class ${className}Service {
