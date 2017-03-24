@@ -31,20 +31,26 @@ export class ${className}Service {
   }
 
   save(${propertyName}: ${className}): Observable<${className}> {
-    let headers = new Headers();
+    const headers = new Headers();
     headers.append("Accept", 'application/json');
     headers.delete("Content-Type");
     headers.append('X-Requested-With', 'XMLHttpRequest');
 
-    let formData: FormData = new FormData();
+    const formData: FormData = new FormData();
 
     for (let property in ${propertyName}) {
       if (${propertyName}.hasOwnProperty(property)) {
-        formData.append(property, ${propertyName}[property]);
+        let value;
+        if (${propertyName}[property] instanceof Date) {
+          value = ${propertyName}[property].toISOString();
+        } else {
+          value = ${propertyName}[property];
+        }
+        formData.append(property, value);
       }
     }
 
-    let requestOptions = new RequestOptions({
+    const requestOptions = new RequestOptions({
       headers: headers,
       body: formData
     });

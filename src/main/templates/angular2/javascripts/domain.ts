@@ -6,10 +6,17 @@ export class ${className} {
   <%= domainProperties.collect { k,v -> "${k}: ${v};" }.join('\n  ') %>
 
   constructor (object?: any) {
-    <%= domainConstructorInitializingStatements.join('\n    ') %>
-    for (var prop in object) {
-      this[prop] = object[prop];
+    if (object) {
+      <% domainConstructorInitializingStatements.keySet().each { String key -> %>
+      if (object.hasOwnProperty('${key}')) {
+        <%= domainConstructorInitializingStatements.get(key).join('\n        ') %>
+      }
+      <% } %>
+      for (var prop in object) {
+        this[prop] = object[prop];
+      }
     }
+
   }
 
   toString(): string {

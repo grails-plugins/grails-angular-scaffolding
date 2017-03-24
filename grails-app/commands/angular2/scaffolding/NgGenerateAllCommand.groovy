@@ -85,31 +85,35 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         List<String> componentProperties = []
         List<String> componentImports = []
         Map<String, String> domainProperties = [:]
-        List<String> domainConstructorInitializingStatements = []
+        Map<String, List<String>> domainConstructorInitializingStatements = [:]
         List<String> domainImports = []
 
         domainModelService.getInputProperties(domainClass).each { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
             domainProperties.put(property.name, 'any')
             if (prop instanceof Association) {
-                associatedProperties.add(property)
                 String type = property.associatedType.simpleName
                 String name = GrailsNameUtils.getPropertyName(type)
+                associatedProperties.add(property)
 
-                constructorArguments.add("private ${name}Service: ${type}Service")
-                initializingStatements.add("this.${name}Service.list().subscribe((${name}List: ${type}[]) => { this.${name}List = ${name}List; });")
-                componentProperties.add("${name}List: ${type}[];")
-                componentImports.add("import { ${type}Service } from '../${name}/${name}.service';")
-                componentImports.add("import { ${type} } from '../${name}/${name}';")
+                if (!prop.bidirectional) {
+                    constructorArguments.add("private ${name}Service: ${type}Service")
+                    initializingStatements.add("this.${name}Service.list().subscribe((${name}List: ${type}[]) => { this.${name}List = ${name}List; });")
+                    componentProperties.add("${name}List: ${type}[];")
+                    componentImports.add("import { ${type}Service } from '../${name}/${name}.service';")
+                    componentImports.add("import { ${type} } from '../${name}/${name}';")
+                }
                 domainImports.add("import { ${type} } from '../${name}/${name}';")
+
+                String initializingStatement
                 if (prop instanceof ToMany) {
                     domainProperties.put(property.name, "$type[]")
-                    domainConstructorInitializingStatements.add("this.${property.name} = object['${property.name}'].map((obj: any) => { return new ${type}(obj); });")
+                    initializingStatement = "this.${property.name} = object['${property.name}'].map((obj: any) => { return new ${type}(obj); });"
                 } else {
                     domainProperties.put(property.name, type)
-                    domainConstructorInitializingStatements.add("this.${property.name} = new ${type}(object['${property.name}']);")
+                    initializingStatement = "this.${property.name} = new ${type}(object['${property.name}']);"
                 }
-                domainConstructorInitializingStatements.add("delete object['${property.name}'];")
+                domainConstructorInitializingStatements.put(property.name, [initializingStatement, "delete object['${property.name}'];"])
             } else {
                 if (fileInputRenderer.supports(property)) {
                     hasFileProperty = true
@@ -145,7 +149,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         File moduleFile = file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts")
         render template: template("angular2/javascripts/module.ts"),
                 destination: moduleFile,
-                model: module.asMap() << [associatedModule: false],
+                model: module.asMap() << [associatedModule: false, importService: true],
                 overwrite: overwrite
 
         render template: template("angular2/javascripts/routing.module.ts"),
@@ -179,25 +183,27 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         }
 
 
-        associatedProperties.each {
+        associatedProperties.each { DomainProperty prop ->
 
-            Model associatedModel = model(it.associatedType)
+            Model associatedModel = model(prop.associatedType)
 
             uri = getUri(associatedModel)
-
-            render template: template("angular2/javascripts/service.ts"),
-                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.service.ts"),
-                    model: associatedModel.asMap() << [uri: uri],
-                    overwrite: overwrite
+            boolean bidirectional = ((Association)prop.persistentProperty).bidirectional
+            if (!bidirectional) {
+                render template: template("angular2/javascripts/service.ts"),
+                        destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.service.ts"),
+                        model: associatedModel.asMap() << [uri: uri],
+                        overwrite: overwrite
+            }
 
             render template: template("angular2/javascripts/domain.ts"),
                     destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.ts"),
-                    model: associatedModel.asMap() << [domainProperties: [:], domainConstructorInitializingStatements: [], domainImports: []],
+                    model: associatedModel.asMap() << [domainProperties: [:], domainConstructorInitializingStatements: [:], domainImports: []],
                     overwrite: overwrite
 
             render template: template("angular2/javascripts/module.ts"),
                     destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.module.ts"),
-                    model: associatedModel.asMap() << [associatedModule: true],
+                    model: associatedModel.asMap() << [associatedModule: true, importService: !bidirectional],
                     overwrite: overwrite
 
             if (angularModuleEditor.addDependency(moduleFile, associatedModel, '..')) {
@@ -221,6 +227,10 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         } catch (UrlMappingException e) {
             model.propertyName
         }
+    }
+
+    void renderDomain(PersistentEntity persistentEntity) {
+
     }
 
 

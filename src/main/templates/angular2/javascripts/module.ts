@@ -1,7 +1,9 @@
 import {CommonModule} from '@angular/common';
 import {NgModule} from '@angular/core';
 import {FormsModule} from '@angular/forms';
+<% if (importService) { %>
 import {${className}Service} from './${propertyName}.service';
+<% } %>
 <% if (!associatedModule) { %>
 import {${className}RoutingModule} from './${propertyName}-routing.module';
 import {${className}ShowComponent} from './${propertyName}-show.component';
@@ -19,8 +21,8 @@ import {${className}PersistComponent} from './${propertyName}-persist.component'
     FormsModule,<% if (!associatedModule) { %>
     ${className}RoutingModule<% } %>
   ],
-  providers: [
-    ${className}Service
+  providers: [<% if (importService) { %>
+    ${className}Service<% } %>
   ]
 })
 export class ${className}Module {}

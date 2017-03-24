@@ -31,7 +31,7 @@ export class ${className}Service {
   }
 
   save(${propertyName}: ${className}): Observable<${className}> {
-    let requestOptions = new RequestOptions();
+    const requestOptions = new RequestOptions();
     if (${propertyName}.id) {
       requestOptions.method = RequestMethod.Put;
       requestOptions.url = this.baseUrl + '${uri}/' + ${propertyName}.id;

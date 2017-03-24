@@ -5,10 +5,11 @@ import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
 import org.grails.datastore.mapping.model.types.Basic
 import org.grails.datastore.mapping.model.types.ToMany
+import org.grails.plugin.scaffolding.angular2.registry.output.PropertyHelper
 import org.grails.scaffolding.model.property.DomainProperty
 import org.grails.scaffolding.registry.DomainInputRenderer
 
-class AngularAssociationInputRenderer implements DomainInputRenderer {
+class AngularAssociationInputRenderer implements DomainInputRenderer, PropertyHelper {
 
     boolean supports(DomainProperty property) {
         PersistentProperty persistentProperty = property.persistentProperty
@@ -26,7 +27,7 @@ class AngularAssociationInputRenderer implements DomainInputRenderer {
 
         return { ->
             select('', defaultAttributes) {
-                option("{{${name}.toString()}}", ["*ngFor": "let $name of ${name}List", "[value]": "${name}.id"])
+                option("{{${name}.toString()}}", ["*ngFor": "let $name of ${name}List", "[value]": "${name}.id", "[selected]": "${buildPropertyPath(property)}?.id == ${name}.id"])
             }
         }
     }
