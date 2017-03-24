@@ -6,6 +6,8 @@ import org.grails.io.support.SpringIOUtils
 
 class NgInstallTemplates implements GrailsApplicationCommand {
 
+    boolean skipBootstrap = true
+
     @Override
     boolean handle() {
         try {

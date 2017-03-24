@@ -24,6 +24,8 @@ import org.springframework.beans.factory.annotation.Value
 
 class NgGenerateAllCommand implements GrailsApplicationCommand {
 
+    boolean skipBootstrap = true
+
     private MappingContext grailsDomainClassMappingContext
 
     @Autowired
