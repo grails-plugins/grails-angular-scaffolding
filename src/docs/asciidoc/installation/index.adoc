@@ -1,6 +1,6 @@
 == Installation
 
-To start using this plugin, add it to your `build.gradle` like the example below. If you created your project with the angular2 profile in Grails 3.2.0 or higher, this is done automatically.
+To start using this plugin, add it to your `build.gradle` like the example below. If you created your project with the angular profile in Grails 3.2.0 or higher, this is done automatically.
 
 [source,groovy,subs="attributes",indent=1]
 .build.gradle

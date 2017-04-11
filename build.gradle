@@ -12,13 +12,13 @@ plugins {
     id 'org.asciidoctor.convert' version '1.5.3'
 }
 
-version "1.0.0.RC1"
+version "2.0.0.RC1"
 group "org.grails.plugins"
 
-apply plugin:"eclipse"
-apply plugin:"idea"
-apply plugin:"org.grails.grails-plugin"
-apply plugin:"org.grails.grails-plugin-publish"
+apply plugin: "eclipse"
+apply plugin: "idea"
+apply plugin: "org.grails.grails-plugin"
+apply plugin: "org.grails.grails-plugin-publish"
 
 repositories {
     mavenLocal()
@@ -57,12 +57,12 @@ bootRepackage.enabled = false
 
 grailsPublish {
     userOrg = "grails"
-    githubSlug = 'grails-plugins/grails-angular2-scaffolding'
+    githubSlug = 'grails-plugins/grails-angular-scaffolding'
     license {
         name = 'Apache-2.0'
     }
-    title = "Angular 2 Scaffolding Plugin"
-    desc = "Provides scaffolding for Angular 2 applications"
+    title = "Angular Scaffolding Plugin"
+    desc = "Provides scaffolding for Angular applications"
     developers = [jameskleeh: "James Kleeh"]
 }
 
@@ -88,7 +88,7 @@ task apidocs(type: Groovydoc) {
 
     destinationDir = new File(buildDir, 'docs/api')
     // Might need a classpath
-    docTitle = "Grails Angular 2 Scaffolding ${version}"
+    docTitle = "Grails Angular Scaffolding ${version}"
 
     classpath = configurations.documentation
     groovyClasspath = configurations.documentation
