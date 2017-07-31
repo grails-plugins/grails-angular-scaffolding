@@ -562,12 +562,12 @@ table.CodeRay td.code>pre{padding:0}
 <pre class="CodeRay highlight"><code data-lang="groovy"> buildscript {
      ...
      dependencies {
-         classpath "org.grails.plugins:angular-scaffolding:2.0.0.RC1"
+         classpath "org.grails.plugins:angular-scaffolding:2.0.0.RC2"
      }
  }
  dependencies {
      ...
-     compile "org.grails.plugins:angular-scaffolding:2.0.0.RC1"
+     compile "org.grails.plugins:angular-scaffolding:2.0.0.RC2"
  }</code></pre>
 </div>
 </div>
@@ -821,7 +821,7 @@ When generating assets for a domain class that already has a module created via 
 <h2 id="_customization">5. Customization</h2>
 <div class="sectionbody">
 <div class="paragraph">
-<p>This plugin is an extension of <a href="https://github.com/grails/scaffolding">Grails Scaffolding Core</a>. To change how markup is rendered in the html templates, see the scaffolding core <a href="http://grails.github.io/scaffolding/1.0.2/">documentation</a>. The following changes have been made:</p>
+<p>This plugin is an extension of <a href="https://github.com/grails/scaffolding">Grails Scaffolding Core</a>. To change how markup is rendered in the html templates, see the scaffolding core <a href="http://grails.github.io/scaffolding/1.1.0/">documentation</a>. The following changes have been made:</p>
 </div>
 <div class="olist arabic">
 <ol class="arabic">
@@ -832,7 +832,7 @@ When generating assets for a domain class that already has a module created via 
 <p>The <code>contextMarkupRenderer</code> has been set to an instance of <a href="api/org/grails/plugin/scaffolding/angular/markup/AngularContextMarkupRenderer.groovy">AngularContextMarkupRenderer</a> that overrides the list output context to use an <code>*ngFor</code>.</p>
 </li>
 <li>
-<p>Additional input and output renderers are registered with a priority of 0. If you wish your own renderers to be used, set a priority higher than 0. See the <a href="http://grails.github.io/scaffolding/1.0.2/#_how_properties_are_rendered">section on how properties are rendered</a> in the scaffolding core documentation for more details on how to do so.</p>
+<p>Additional input and output renderers are registered with a priority of 0. If you wish your own renderers to be used, set a priority higher than 0. See the <a href="http://grails.github.io/scaffolding/1.1.0/#_how_properties_are_rendered">section on how properties are rendered</a> in the scaffolding core documentation for more details on how to do so.</p>
 </li>
 </ol>
 </div>
@@ -844,7 +844,7 @@ When generating assets for a domain class that already has a module created via 
 </div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2017-04-11 13:51:45 UTC
+Last updated 2017-07-31 01:52:50 UTC
 </div>
 </div>
 </body>
