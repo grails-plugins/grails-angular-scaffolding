@@ -9,6 +9,7 @@ import org.grails.datastore.mapping.model.MappingContext
 import org.grails.datastore.mapping.model.PersistentEntity
 import org.grails.datastore.mapping.model.PersistentProperty
 import org.grails.datastore.mapping.model.types.Association
+import org.grails.datastore.mapping.model.types.ManyToOne
 import org.grails.datastore.mapping.model.types.ToMany
 import org.grails.plugin.scaffolding.angular.template.AngularModuleEditor
 import org.grails.scaffolding.markup.DomainMarkupRenderer
@@ -89,6 +90,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         Map<String, String> domainProperties = [:]
         Map<String, List<String>> domainConstructorInitializingStatements = [:]
         List<String> domainImports = []
+        List<String> routeParams = []
 
         domainModelService.getInputProperties(domainClass).each { DomainProperty property ->
             PersistentProperty prop = property.persistentProperty
@@ -98,12 +100,22 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                 String name = GrailsNameUtils.getPropertyName(type)
                 associatedProperties.add(property)
 
-                if (!prop.bidirectional) {
+                boolean owningSide = prop.owningSide
+                if (prop instanceof ManyToOne) {
+                    owningSide = false
+                }
+
+                if (!prop.bidirectional || !owningSide) {
                     constructorArguments.add("private ${name}Service: ${type}Service")
                     initializingStatements.add("this.${name}Service.list().subscribe((${name}List: ${type}[]) => { this.${name}List = ${name}List; });")
+                    routeParams.add("""
+      if (params.hasOwnProperty('${name}Id')) {
+        this.${module.propertyName}.${property.name} = new $type({id: params['${name}Id']})
+      }
+""")
                     componentProperties.add("${name}List: ${type}[];")
-                    componentImports.add("import { ${type}Service } from '../${name}/${name}.service';")
-                    componentImports.add("import { ${type} } from '../${name}/${name}';")
+                    componentImports.add("import { ${type}Service } from '../core/${name}/${name}.service';")
+                    componentImports.add("import { ${type} } from '../core/${name}/${name}';")
                 }
                 domainImports.add("import { ${type} } from '../${name}/${name}';")
 
@@ -134,24 +146,31 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                     }
                 }
             }
-
         }
 
+        File coreModule = file("${baseDir}/core/core.module.ts")
+        Model coreModel = model("Core")
+        if (!coreModule.exists()) {
+            render template: template("angular/javascripts/module.ts"),
+                    destination: coreModule,
+                    model: [className: "Core", associatedModule: true],
+                    overwrite: false
+        }
 
         render template: template(hasFileProperty ? "angular/javascripts/service-file.ts" : "angular/javascripts/service.ts"),
-                destination: file("${baseDir}/${module.propertyName}/${module.propertyName}.service.ts"),
+                destination: file("${baseDir}/core/${module.propertyName}/${module.propertyName}.service.ts"),
                 model: module.asMap() << [uri: uri],
                 overwrite: overwrite
 
         render template: template("angular/javascripts/domain.ts"),
-                destination: file("${baseDir}/${module.propertyName}/${module.propertyName}.ts"),
+                destination: file("${baseDir}/core/${module.propertyName}/${module.propertyName}.ts"),
                 model: module.asMap() << [domainProperties: domainProperties, domainConstructorInitializingStatements: domainConstructorInitializingStatements, domainImports: domainImports],
                 overwrite: overwrite
 
         File moduleFile = file("${baseDir}/${module.propertyName}/${module.propertyName}.module.ts")
         render template: template("angular/javascripts/module.ts"),
                 destination: moduleFile,
-                model: module.asMap() << [associatedModule: false, importService: true],
+                model: module.asMap() << [associatedModule: false],
                 overwrite: overwrite
 
         render template: template("angular/javascripts/routing.module.ts"),
@@ -162,7 +181,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         ['persist', 'list', 'show'].each {
             render template: template("angular/javascripts/${it}.component.ts"),
                     destination: file("${baseDir}/${module.propertyName}/${module.propertyName}-${it}.component.ts"),
-                    model: module.asMap() << [initializingStatements: initializingStatements, constructorArguments: constructorArguments, componentProperties: componentProperties, componentImports: componentImports],
+                    model: module.asMap() << [initializingStatements: initializingStatements, constructorArguments: constructorArguments, componentProperties: componentProperties, componentImports: componentImports, routeParams: routeParams],
                     overwrite: overwrite
 
             render template: template("angular/views/${it}.component.html"),
@@ -175,7 +194,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
         File appModule = new File(baseDir, bootstrapModule)
 
         if (appModule.exists() && appModule.isFile()) {
-            if (angularModuleEditor.addDependency(appModule, module)) {
+            if (angularModuleEditor.addDependency(appModule, module, '.')) {
                 println("Added ${module.className} as a dependency to your bootstrap module")
             } else {
                 println("Warning | An error occurred importing the ${module.className} module into your bootstrap module")
@@ -184,35 +203,46 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             println("Warning | Bootstrap module ${baseDir}/${bootstrapModule} not found. You will have to import the ${module.className} module yourself")
         }
 
+        if (angularModuleEditor.addDependency(moduleFile, coreModel, '..')) {
+            println("Added ${coreModel.className} as a dependency to your ${module.propertyName} module")
+        } else {
+            println("Warning | An error occurred importing the ${coreModel.className} module into your ${module.propertyName} module")
+        }
+
+        angularModuleEditor.addProvider(coreModule, module, '.')
+
 
         associatedProperties.each { DomainProperty prop ->
 
             Model associatedModel = model(prop.associatedType)
 
             uri = getUri(associatedModel)
-            boolean bidirectional = ((Association)prop.persistentProperty).bidirectional
-            if (!bidirectional) {
-                render template: template("angular/javascripts/service.ts"),
-                        destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.service.ts"),
-                        model: associatedModel.asMap() << [uri: uri],
-                        overwrite: overwrite
-            }
 
             render template: template("angular/javascripts/domain.ts"),
-                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.ts"),
+                    destination: file("${baseDir}/core/${associatedModel.propertyName}/${associatedModel.propertyName}.ts"),
                     model: associatedModel.asMap() << [domainProperties: [:], domainConstructorInitializingStatements: [:], domainImports: []],
-                    overwrite: overwrite
+                    overwrite: false
 
-            render template: template("angular/javascripts/module.ts"),
-                    destination: file("${baseDir}/${associatedModel.propertyName}/${associatedModel.propertyName}.module.ts"),
-                    model: associatedModel.asMap() << [associatedModule: true, importService: !bidirectional],
-                    overwrite: overwrite
-
-            if (angularModuleEditor.addDependency(moduleFile, associatedModel, '..')) {
-                println("Added ${associatedModel.className} as a dependency to your ${module.propertyName} module")
-            } else {
-                println("Warning | An error occurred importing the ${associatedModel.className} module into your ${module.propertyName} module")
+            Association association = (Association) prop.persistentProperty
+            boolean owningSide = association.owningSide
+            if (association instanceof ManyToOne) {
+                owningSide = false
             }
+
+            if (!association.bidirectional || !owningSide) {
+                render template: template("angular/javascripts/service.ts"),
+                        destination: file("${baseDir}/core/${associatedModel.propertyName}/${associatedModel.propertyName}.service.ts"),
+                        model: associatedModel.asMap() << [uri: uri],
+                        overwrite: false
+
+                if (angularModuleEditor.addProvider(coreModule, associatedModel, './core/')) {
+                    println("Added ${associatedModel.className} as a dependency to your core module")
+                } else {
+                    println("Warning | An error occurred importing the ${associatedModel.className} module into your core module")
+                }
+
+            }
+
         }
 
         true
@@ -230,10 +260,5 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
             model.propertyName
         }
     }
-
-    void renderDomain(PersistentEntity persistentEntity) {
-
-    }
-
 
 }

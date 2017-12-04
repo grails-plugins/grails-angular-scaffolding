@@ -7,14 +7,23 @@ import groovy.json.JsonSlurper
 import groovy.util.logging.Slf4j
 
 import java.util.regex.Matcher
+import java.util.regex.Pattern
 
 @Slf4j
 class AngularModuleEditorImpl implements AngularModuleEditor {
 
     @Override
     boolean addModuleImport(File module, Model model) {
+        addModuleDependency(module, "${model.className}Module", "imports")
+    }
+
+    @Override
+    boolean addModuleProvider(File module, Model model) {
+        addModuleDependency(module, "${model.className}Service", "providers")
+    }
+
+    protected boolean addModuleDependency(File module, String moduleName, String arrayKey) {
         String jsonString
-        String moduleName = getModuleName(model)
         try {
             StringBuilder sb = new StringBuilder()
             final String moduleText = module.text
@@ -22,7 +31,8 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
             Matcher group = (moduleText =~ /(?s)@NgModule(?:\s*)\((?:\s*)\{(?:.*?)}/)
             if (group.size() > 0) {
                 final String moduleDefinition = group[0]
-                Matcher imports = (moduleDefinition =~ /imports:(?:\s*?)\[/)
+                Pattern pattern = Pattern.compile("${arrayKey}:(?:\\s*?)\\[")
+                Matcher imports = (moduleDefinition =~ pattern)
                 if (imports.size() > 0) {
                     //unused on purpose.. has to initialize [0] before .start() works
                     final String importDefinition = imports[0]
@@ -54,7 +64,7 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
                     module.write(sb.toString())
                     true
                 } else {
-                    if ((moduleDefinition =~ /imports/).size() == 0) {
+                    if ((moduleDefinition =~ Pattern.compile(arrayKey)).size() == 0) {
                         //create new imports array
                         Matcher moduleConfigMatcher = (moduleDefinition =~ /(?s)\{(\s*?)([a-z]*?):(\s*?)\[(.*?)](,?)(\s*?)}/)
                         int startingIndex = 0
@@ -72,7 +82,7 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
                             startingIndex = group.start() + moduleDefinition.indexOf('{') + 1
                             sb.append(moduleText.substring(0, startingIndex))
                         }
-                        sb.append("${ls}imports: [${ls}    ${moduleName}${ls}]${ls}")
+                        sb.append("${ls}${arrayKey}: [${ls}    ${moduleName}${ls}]${ls}")
                         sb.append(moduleText.substring(startingIndex+1))
                         module.write(sb.toString())
                         true
@@ -93,13 +103,13 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
     }
 
     @Override
-    boolean addImport(File module, Model model, String relativeDir = '.') {
-        String importStatement = "import { ${getModuleName(model)} } from '${relativeDir}/${model.propertyName}/${model.propertyName}.module';"
+    boolean addImport(File module, String className, String path, String relativeDir = '.') {
+        String importStatement = "import { ${className} } from '${relativeDir}/${path}';"
         try {
             String moduleText = module.text
             Matcher group = (moduleText =~ /import .*(?:\r\n|\n|\r)?/)
 
-            if (group.any { it =~ /import\s*\{\s*${getModuleName(model)}/ }) {
+            if (group.any { it =~ /import\s*\{\s*${className}/ }) {
                 return true
             }
             int index = 0
@@ -121,14 +131,25 @@ class AngularModuleEditorImpl implements AngularModuleEditor {
         }
     }
 
-    private String getModuleName(Model model) {
-        "${model.className}Module"
-    }
-
     @Override
     boolean addDependency(File module, Model model, String relativeDir = '.') {
         String originalText = module.text
-        if (addModuleImport(module, model) && addImport(module, model, relativeDir)) {
+        String className = "${model.className}Module"
+        String path = "${model.propertyName}/${model.propertyName}.module"
+        if (addModuleImport(module, model) && addImport(module, className, path, relativeDir)) {
+            true
+        } else {
+            module.write(originalText)
+            false
+        }
+    }
+
+    @Override
+    boolean addProvider(File module, Model model, String relativeDir = '.') {
+        String originalText = module.text
+        String className = "${model.className}Service"
+        String path = "${model.propertyName}/${model.propertyName}.service"
+        if (addModuleProvider(module, model) && addImport(module, className, path, relativeDir)) {
             true
         } else {
             module.write(originalText)

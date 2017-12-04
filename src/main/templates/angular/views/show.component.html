@@ -9,7 +9,8 @@
     <h1>Show ${className}</h1>
     ${template}
 
-    <a class="edit" [routerLink]="['/${propertyName}', 'edit', ${propertyName}.id]">Edit</a>
-    <button type="button" (click)="destroy()">Delete</button>
-
+    <div class="buttons">
+        <a class="edit" [routerLink]="['/${propertyName}', 'edit', ${propertyName}.id]">Edit</a>
+        <input type="button" class="delete" (click)="destroy()" value="Delete" />
+    </div>
 </div>

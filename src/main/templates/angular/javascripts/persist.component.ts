@@ -1,7 +1,7 @@
 import {Component, OnInit} from '@angular/core';
 import {ActivatedRoute, Params, Router} from '@angular/router';
-import {${className}} from './${propertyName}';
-import {${className}Service} from './${propertyName}.service';
+import {${className}} from '../core/${propertyName}/${propertyName}';
+import {${className}Service} from '../core/${propertyName}/${propertyName}.service';
 import {Response} from "@angular/http";
 <%= componentImports.join('\n') %>
 
@@ -27,6 +27,7 @@ export class ${className}PersistComponent implements OnInit {
           this.${propertyName} = ${propertyName};
         });
       }
+      <%= routeParams.join('\n      ') %>
     });
   }
 

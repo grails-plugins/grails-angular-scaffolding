@@ -25,7 +25,7 @@ class AngularBidirectionalToManyInputRenderer extends BidirectionalToManyInputRe
         final String identityName = property.domainClass.identity.name
         final String objectName = "${getPropertyName(property)}.${identityName}"
         return { ->
-            a("Add ${getAssociatedClassName(property)}", ["[routerLink]": "['${stateName}/create', {${getInverseSideName(property)}Id: ${objectName}}]"])
+            a("Add ${getAssociatedClassName(property)}", ["[routerLink]": "['/${stateName}/create', {${getInverseSideName(property)}Id: ${objectName}}]"])
         }
     }
 }

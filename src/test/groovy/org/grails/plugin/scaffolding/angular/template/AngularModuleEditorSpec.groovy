@@ -436,7 +436,7 @@ imports: [
         """)
 
         when:
-        boolean success = editor.addImport(file, model)
+        boolean success = editor.addImport(file, 'BarModule', 'bar/bar.module')
 
         then:
         file.text == """
@@ -456,7 +456,7 @@ export class Foo {}
         """)
 
         when:
-        boolean success = editor.addImport(file, model)
+        boolean success = editor.addImport(file, 'BarModule', 'bar/bar.module')
 
         then:
         file.text == """
@@ -476,7 +476,7 @@ export class Foo {}
         """)
 
         when:
-        boolean success = editor.addImport(file, model)
+        boolean success = editor.addImport(file, 'BarModule', 'bar/bar.module')
 
         then:
         file.text == """
@@ -494,7 +494,7 @@ export class Foo {}
         """)
 
         when:
-        boolean success = editor.addImport(file, model)
+        boolean success = editor.addImport(file, 'BarModule', 'bar/bar.module')
 
         then: "it will add it to the beginning of the file"
         file.text == """${expectedImport}
@@ -515,7 +515,7 @@ export class Foo {}
         """)
 
         when:
-        boolean success = editor.addImport(file, model)
+        boolean success = editor.addImport(file, 'BarModule', 'bar/bar.module')
 
         then:
         file.text == """
