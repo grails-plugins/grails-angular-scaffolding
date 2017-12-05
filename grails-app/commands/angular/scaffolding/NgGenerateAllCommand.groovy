@@ -235,7 +235,7 @@ class NgGenerateAllCommand implements GrailsApplicationCommand {
                         model: associatedModel.asMap() << [uri: uri],
                         overwrite: false
 
-                if (angularModuleEditor.addProvider(coreModule, associatedModel, './core/')) {
+                if (angularModuleEditor.addProvider(coreModule, associatedModel, '.')) {
                     println("Added ${associatedModel.className} as a dependency to your core module")
                 } else {
                     println("Warning | An error occurred importing the ${associatedModel.className} module into your core module")
