@@ -49,7 +49,7 @@ dependencies {
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
     testCompile "org.grails:grails-plugin-testing"
-    documentation "org.codehaus.groovy:groovy-all:2.4.6"
+    documentation "org.codehaus.groovy:groovy-all:$groovyVersion"
 }
 
 bootRun {
