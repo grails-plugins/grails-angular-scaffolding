@@ -48,7 +48,9 @@ dependencies {
     console "org.grails:grails-console"
     compile "org.grails:scaffolding-core:$scaffoldingCoreVersion"
     profile "org.grails.profiles:plugin"
-    testCompile "org.grails:grails-plugin-testing"
+    testCompile("org.spockframework:spock-core:${spockVersion}") {
+        exclude group:'org.codehaus.groovy', module: 'groovy-all'
+    }
     documentation "org.codehaus.groovy:groovy-all:$groovyVersion"
 }
 
