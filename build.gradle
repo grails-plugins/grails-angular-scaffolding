@@ -32,8 +32,8 @@ dependencyManagement {
     applyMavenExclusions false
 }
 
-targetCompatibility = 1.7
-sourceCompatibility = 1.7
+targetCompatibility = 1.8
+sourceCompatibility = 1.8
 
 configurations {
     documentation
